@@ -1,7 +1,7 @@
-import Book from '../models/book.js';
+import * as Book from '../models/book.js';
 
-const addBookHandler = (req, h) => {
-  const { name, year, author, summary, publisher, pageCount, readPage, reading } = req.payload;
+const addBookHandler = (request, h) => {
+  const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
 
   if (!name) {
     return h.response({
@@ -18,34 +18,31 @@ const addBookHandler = (req, h) => {
   }
 
   const newBook = Book.addBook({ name, year, author, summary, publisher, pageCount, readPage, reading });
-
+  
   return h.response({
     status: 'success',
     message: 'Buku berhasil ditambahkan',
-    data: {
-      bookId: newBook.id,
-    },
+    data: { bookId: newBook.id },
   }).code(201);
 };
 
-const getAllBooksHandler = (req, h) => {
+const getAllBooksHandler = (request, h) => {
   const books = Book.getAllBooks();
-  const filteredBooks = books.map((book) => ({
-    id: book.id,
-    name: book.name,
-    publisher: book.publisher,
-  }));
-
+  
   return h.response({
     status: 'success',
     data: {
-      books: filteredBooks,
+      books: books.map((book) => ({
+        id: book.id,
+        name: book.name,
+        publisher: book.publisher,
+      })),
     },
   }).code(200);
 };
 
-const getBookByIdHandler = (req, h) => {
-  const { bookId } = req.params;
+const getBookByIdHandler = (request, h) => {
+  const { bookId } = request.params;
   const book = Book.getBookById(bookId);
 
   if (!book) {
@@ -63,9 +60,9 @@ const getBookByIdHandler = (req, h) => {
   }).code(200);
 };
 
-const updateBookHandler = (req, h) => {
-  const { bookId } = req.params;
-  const { name, year, author, summary, publisher, pageCount, readPage, reading } = req.payload;
+const updateBookHandler = (request, h) => {
+  const { bookId } = request.params;
+  const { name, year, author, summary, publisher, pageCount, readPage, reading } = request.payload;
 
   if (!name) {
     return h.response({
@@ -93,29 +90,24 @@ const updateBookHandler = (req, h) => {
   return h.response({
     status: 'success',
     message: 'Buku berhasil diperbarui',
-    data: {
-      book: updatedBook,
-    },
   }).code(200);
 };
 
-const deleteBookHandler = (req, h) => {
-  const { bookId } = req.params;
+const deleteBookHandler = (request, h) => {
+  const { bookId } = request.params;
+  const result = Book.deleteBook(bookId);
 
-  const success = Book.deleteBook(bookId);
-
-  if (!success) {
+  if (!result.success) {
     return h.response({
       status: 'fail',
-      message: 'Buku tidak ditemukan',
+      message: result.message,
     }).code(404);
   }
 
   return h.response({
     status: 'success',
-    message: 'Buku berhasil dihapus',
+    message: result.message,
   }).code(200);
 };
 
 export { addBookHandler, getAllBooksHandler, getBookByIdHandler, updateBookHandler, deleteBookHandler };
-

@@ -1,6 +1,7 @@
 let books = [];
 
 const addBook = ({ name, year, author, summary, publisher, pageCount, readPage, reading }) => {
+  const finished = pageCount === readPage;
   const newBook = {
     id: Date.now().toString(),
     name,
@@ -11,7 +12,9 @@ const addBook = ({ name, year, author, summary, publisher, pageCount, readPage, 
     pageCount,
     readPage,
     reading,
-    finished: pageCount === readPage,
+    finished,
+    insertedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
   books.push(newBook);
   return newBook;
@@ -25,16 +28,31 @@ const updateBook = (id, { name, year, author, summary, publisher, pageCount, rea
   const index = books.findIndex((book) => book.id === id);
   if (index === -1) return null;
 
-  books[index] = { id, name, year, author, summary, publisher, pageCount, readPage, reading, finished: pageCount === readPage };
+  const finished = pageCount === readPage;
+  books[index] = {
+    ...books[index], // Mempertahankan data `insertedAt` sebelumnya
+    name,
+    year,
+    author,
+    summary,
+    publisher,
+    pageCount,
+    readPage,
+    reading,
+    finished,
+    updatedAt: new Date().toISOString(),
+  };
   return books[index];
 };
 
 const deleteBook = (id) => {
   const index = books.findIndex((book) => book.id === id);
-  if (index === -1) return false;
+  if (index === -1) {
+    return { success: false, message: 'Buku gagal dihapus. Id tidak ditemukan' };
+  }
 
   books.splice(index, 1);
-  return true;
+  return { success: true, message: 'Buku berhasil dihapus' };
 };
 
-export default { addBook, getAllBooks, getBookById, updateBook, deleteBook };
+export { addBook, getAllBooks, getBookById, updateBook, deleteBook };

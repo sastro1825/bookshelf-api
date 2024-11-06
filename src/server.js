@@ -1,11 +1,5 @@
 import Hapi from '@hapi/hapi';
-import { 
-  addBookHandler, 
-  getAllBooksHandler, 
-  getBookByIdHandler, 
-  updateBookHandler, 
-  deleteBookHandler 
-} from './handlers/handler.js';
+import { addBookHandler, getAllBooksHandler, getBookByIdHandler, updateBookHandler, deleteBookHandler } from './handlers/handler.js';
 
 const init = async () => {
   const server = Hapi.server({
@@ -13,7 +7,6 @@ const init = async () => {
     host: 'localhost',
   });
 
-  // Define Routes
   server.route({
     method: 'POST',
     path: '/books',
